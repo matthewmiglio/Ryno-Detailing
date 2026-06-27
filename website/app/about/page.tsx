@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "About",
   description:
     "Ryno Detailing is a local, owner-run detailing shop built by Ryder Helms and Noah Pickelhaupt. Meet the team behind the reset.",
+  alternates: { canonical: "/about" },
 };
 
 export default function About() {

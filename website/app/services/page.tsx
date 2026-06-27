@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Services",
   description:
     "Detailing packages and the full menu of services: interior deep cleans, carpet shampoo, leather care, foam cannon wash, pet hair removal, and more.",
+  alternates: { canonical: "/services" },
 };
 
 export default function Services() {

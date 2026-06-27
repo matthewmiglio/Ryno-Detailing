@@ -4,6 +4,7 @@ import { contact } from "../data";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "The terms that govern use of the Ryno Detailing website and services.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function Terms() {

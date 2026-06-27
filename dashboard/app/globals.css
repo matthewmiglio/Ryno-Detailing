@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+/* Dashboard is a dark, brand-black admin tool. Set it on the body so the whole
+   viewport is dark (the page uses light text throughout). */
+body {
+  background: #101010;
+  color: #ededed;
+}

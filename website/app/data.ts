@@ -1,5 +1,11 @@
 // Shared site data. ponytail: one source so pages don't duplicate copy.
 
+// Canonical production origin for metadata/sitemap/robots/JSON-LD. Override per
+// environment with NEXT_PUBLIC_SITE_URL (set it in Vercel). Trailing slash stripped.
+export const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://rynodetailing.com"
+).replace(/\/$/, "");
+
 export const contact = {
   phone: "989 884 7661",
   phoneHref: "tel:+19898847661",

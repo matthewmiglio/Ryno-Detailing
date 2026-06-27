@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Call, email, or send a message to book your detail. Ryno Detailing replies fast.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function Contact() {

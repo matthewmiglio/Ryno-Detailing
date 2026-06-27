@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Saira, Saira_Condensed } from "next/font/google";
-import { contact } from "./data";
+import { contact, subServices, siteUrl } from "./data";
+import { JsonLd, businessLd } from "./seo";
 import AnalyticsTracker from "./AnalyticsTracker";
 import "./globals.css";
 
@@ -9,30 +10,48 @@ const body = Saira({ subsets: ["latin"], weight: ["300", "400", "500"], variable
 const display = Saira_Condensed({ subsets: ["latin"], weight: ["500", "700", "800"], variable: "--font-display" });
 
 export const metadata: Metadata = {
-  title: { default: "Ryno Detailing", template: "%s | Ryno Detailing" },
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Ryno Detailing | Auto Detailing in Northern Michigan",
+    template: "%s | Ryno Detailing",
+  },
   description:
     "High-octane auto detailing. Interior deep cleans, exterior washes, and showroom-grade resets. Call to book.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Ryno Detailing",
+    url: siteUrl,
+    images: ["/images/black-leather-front-cab-overview-after.jpg"],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/gallery", label: "Results" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${body.variable} ${display.variable}`}>
       <body>
+        <JsonLd data={businessLd} />
         <AnalyticsTracker />
         <nav>
           <Link href="/" className="logo">RYNO<i>/</i>DETAILING</Link>
           <ul>
-            {navLinks.map((l) => (
-              <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
-            ))}
+            <li><Link href="/">Home</Link></li>
+            <li className="navdd">
+              <details>
+                <summary>Services</summary>
+                <div className="ddmenu">
+                  <Link href="/services">All Services</Link>
+                  {subServices.map((s) => (
+                    <Link key={s.slug} href={`/services/${s.slug}`}>{s.lead} {s.accent}</Link>
+                  ))}
+                </div>
+              </details>
+            </li>
+            <li><Link href="/gallery">Results</Link></li>
+            <li><Link href="/about">About</Link></li>
+            <li><Link href="/contact">Contact</Link></li>
             <li><a href={contact.phoneHref} className="navcta">Call {contact.phone}</a></li>
           </ul>
         </nav>

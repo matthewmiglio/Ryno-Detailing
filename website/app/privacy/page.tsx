@@ -4,6 +4,7 @@ import { contact } from "../data";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How Ryno Detailing collects, uses, and protects your information.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function Privacy() {

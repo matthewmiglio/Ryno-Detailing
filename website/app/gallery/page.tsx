@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Results",
   description:
     "Before and after detailing results. Real interiors, real grime, real resets. See the difference a Ryno detail makes.",
+  alternates: { canonical: "/gallery" },
 };
 
 export default function Gallery() {
