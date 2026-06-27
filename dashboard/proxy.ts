@@ -11,7 +11,21 @@ export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
 
-// TEMP: auth gate disabled for a style audit. Restore the real proxy() below.
-export function proxy(_req: NextRequest) {
+export function proxy(req: NextRequest) {
+  const user = process.env.DASHBOARD_USER;
+  const pwd = process.env.DASHBOARD_PASSWORD;
+  if (!user || !pwd) {
+    return new NextResponse("DASHBOARD_USER / DASHBOARD_PASSWORD not set", {
+      status: 500,
+    });
+  }
+  // btoa, not Buffer: proxy runs on the Edge runtime.
+  const expected = "Basic " + btoa(`${user}:${pwd}`);
+  if (req.headers.get("authorization") !== expected) {
+    return new NextResponse("Auth required", {
+      status: 401,
+      headers: { "WWW-Authenticate": 'Basic realm="dashboard"' },
+    });
+  }
   return NextResponse.next();
 }
