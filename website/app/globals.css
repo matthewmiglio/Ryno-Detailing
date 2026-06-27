@@ -1,26 +1,197 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===== Ryno Detailing — desktop-only stylesheet (see docs/style.md) ===== */
+/* ponytail: desktop only, no mobile breakpoints by request */
+
+:root{
+  --orange:#ff7314; --black:#101010; --surface:#1a1a1a; --border:#444;
+  --text:#fff; --text-muted:#bbb; --text-dim:#aaa; --text-faint:#777;
+  --nav-link:#ddd; --on-orange:#111;
+  /* --font-display / --font-body are injected by next/font in layout.tsx */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body{
+  font-family:var(--font-body), sans-serif;
+  background:var(--black); color:var(--text);
+  min-width:1280px; overflow-x:hidden;
 }
+.cond{ font-family:var(--font-display), sans-serif; }
+a{ color:inherit; }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* ---- Nav ---- */
+nav{ display:flex; justify-content:space-between; align-items:center;
+     padding:26px 64px; position:relative; z-index:10; }
+.logo{ font-family:var(--font-display); font-weight:800; font-size:28px;
+       text-transform:uppercase; letter-spacing:1px; text-decoration:none; }
+.logo i{ color:var(--orange); font-style:normal; }
+nav ul{ display:flex; align-items:center; gap:34px; list-style:none; }
+nav a{ color:var(--nav-link); text-decoration:none; font-size:13px;
+       letter-spacing:2px; text-transform:uppercase; }
+nav a:hover{ color:var(--orange); }
+.navcta{ background:var(--orange); color:var(--on-orange) !important;
+         padding:12px 22px; font-weight:600; }
+.navcta:hover{ color:var(--on-orange) !important; filter:brightness(1.08); }
+
+/* ---- Buttons ---- */
+.btns a{ display:inline-block; text-decoration:none; text-transform:uppercase;
+         letter-spacing:2px; font-weight:500; font-size:13px;
+         padding:16px 36px; margin-right:14px; }
+.b1{ background:var(--orange); color:var(--on-orange); }
+.b1:hover{ filter:brightness(1.08); }
+.b2{ border:2px solid var(--border); color:var(--text); }
+.b2:hover{ border-color:var(--orange); color:var(--orange); }
+
+/* ---- Hero ---- */
+.hero{ position:relative; padding:70px 64px 150px;
+       display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+.hero h1{ font-family:var(--font-display); font-weight:800; font-size:96px;
+          line-height:.9; text-transform:uppercase; }
+.hero h1 span{ color:var(--orange); }
+.hero p{ color:var(--text-muted); font-size:18px; margin:24px 0 34px;
+         max-width:440px; line-height:1.6; }
+.heroframe{ position:relative; height:460px; overflow:hidden;
+            clip-path:polygon(8% 0, 100% 0, 92% 100%, 0 100%); }
+.heroframe img{ width:100%; height:100%; object-fit:cover; }
+
+/* ---- Skewed stat band ---- */
+.angle{ background:var(--orange); color:var(--on-orange);
+        transform:skewY(-3deg); margin:-40px 0; padding:90px 0; }
+.angle .inner{ transform:skewY(3deg); padding:0 64px;
+               display:grid; grid-template-columns:repeat(4,1fr);
+               gap:30px; text-align:center; }
+.angle .stat b{ font-family:var(--font-display); font-weight:800;
+                font-size:62px; display:block; line-height:1; }
+.angle .stat span{ text-transform:uppercase; letter-spacing:2px;
+                   font-size:13px; font-weight:500; }
+
+/* ---- Service section / cards ---- */
+.svc{ padding:130px 64px 90px; }
+.svc h2{ font-family:var(--font-display); font-weight:800; font-size:60px;
+         text-transform:uppercase; margin-bottom:46px; }
+.svc h2 span{ color:var(--orange); }
+.scards{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.scard{ background:var(--surface); border-left:4px solid var(--orange);
+        padding:34px; transition:.2s; }
+.scard:hover{ transform:translateY(-8px); }
+.scard h3{ font-family:var(--font-display); font-weight:700;
+           text-transform:uppercase; font-size:26px; margin-bottom:12px; }
+.scard p{ color:var(--text-dim); line-height:1.6; font-size:15px; }
+.scard .pr{ color:var(--orange); font-weight:700; margin-top:18px; font-size:20px; }
+
+/* ---- Service list (the 18 individual services) ---- */
+.slist{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.sitem{ background:var(--surface); border-left:4px solid var(--orange);
+        padding:20px 24px; font-family:var(--font-display); font-weight:700;
+        text-transform:uppercase; font-size:20px; letter-spacing:.5px;
+        transition:.2s; }
+.sitem:hover{ transform:translateY(-6px); }
+
+/* ---- Angled CTA image ---- */
+.ctaimg{ position:relative; height:420px; overflow:hidden;
+         clip-path:polygon(0 12%, 100% 0, 100% 100%, 0 100%); }
+.ctaimg img{ width:100%; height:100%; object-fit:cover; filter:brightness(.4); }
+.ctaimg .ov{ position:absolute; inset:0; display:flex; flex-direction:column;
+             justify-content:center; align-items:center; text-align:center; }
+.ctaimg h2{ font-family:var(--font-display); font-weight:800;
+            font-size:64px; text-transform:uppercase; }
+.ctaimg a{ margin-top:24px; background:var(--orange); color:var(--on-orange);
+           padding:18px 44px; text-decoration:none; text-transform:uppercase;
+           letter-spacing:2px; font-weight:600; }
+.ctaimg a:hover{ filter:brightness(1.08); }
+
+/* ---- Inner-page header ---- */
+.pagehead{ padding:80px 64px 40px; }
+.pagehead h1{ font-family:var(--font-display); font-weight:800; font-size:80px;
+              text-transform:uppercase; line-height:.95; }
+.pagehead h1 span{ color:var(--orange); }
+.pagehead p{ color:var(--text-muted); font-size:18px; margin-top:18px; max-width:620px;
+             line-height:1.6; }
+
+/* generic content section padding */
+.pad{ padding:40px 64px 90px; }
+
+/* ---- Gallery ---- */
+.gallery{ display:grid; grid-template-columns:repeat(2,1fr); gap:28px; }
+.ba{ background:var(--surface); padding:14px; transition:.2s; }
+.ba:hover{ transform:translateY(-8px); }
+.ba .pair{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.ba figure{ position:relative; height:240px; overflow:hidden; }
+.ba img{ width:100%; height:100%; object-fit:cover; }
+.ba figcaption{ position:absolute; top:10px; left:10px; background:var(--orange);
+                color:var(--on-orange); font-size:11px; font-weight:700;
+                letter-spacing:2px; text-transform:uppercase; padding:5px 10px; }
+.ba .lbl{ font-family:var(--font-display); font-weight:700; text-transform:uppercase;
+          font-size:20px; margin-top:12px; }
+
+/* ---- About / team ---- */
+.about{ display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+.about p{ color:var(--text-muted); font-size:18px; line-height:1.7; margin-bottom:18px; }
+.aboutframe{ position:relative; height:440px; overflow:hidden;
+             clip-path:polygon(8% 0, 100% 0, 92% 100%, 0 100%); }
+.aboutframe img{ width:100%; height:100%; object-fit:cover; }
+.team{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:50px; }
+.member{ background:var(--surface); border-left:4px solid var(--orange);
+         padding:34px; display:flex; gap:22px; align-items:center; }
+.avatar{ width:84px; height:84px; flex:0 0 84px; background:var(--orange);
+         color:var(--on-orange); font-family:var(--font-display); font-weight:800;
+         font-size:30px; display:flex; align-items:center; justify-content:center; }
+.member h3{ font-family:var(--font-display); font-weight:700; font-size:24px;
+            text-transform:uppercase; }
+.member .role{ color:var(--orange); text-transform:uppercase; letter-spacing:2px;
+               font-size:12px; font-weight:600; margin:4px 0 10px; }
+.member p{ color:var(--text-dim); font-size:14px; line-height:1.6; }
+
+/* ---- Contact ---- */
+.contact{ display:grid; grid-template-columns:1fr 1fr; gap:50px; }
+.cinfo .row{ margin-bottom:28px; }
+.cinfo .k{ text-transform:uppercase; letter-spacing:2px; font-size:12px;
+           color:var(--text-faint); margin-bottom:6px; }
+.cinfo .v{ font-family:var(--font-display); font-weight:700; font-size:30px;
+           text-transform:uppercase; }
+.cinfo .v a{ text-decoration:none; }
+.cinfo .v a:hover{ color:var(--orange); }
+.callbtn{ display:inline-block; background:var(--orange); color:var(--on-orange);
+          padding:18px 44px; text-decoration:none; text-transform:uppercase;
+          letter-spacing:2px; font-weight:600; margin-top:10px; }
+.callbtn:hover{ filter:brightness(1.08); }
+.cform{ background:var(--surface); padding:34px; }
+.cform label{ display:block; text-transform:uppercase; letter-spacing:2px;
+              font-size:12px; color:var(--text-faint); margin:0 0 6px; }
+.cform .field{ margin-bottom:20px; }
+.cform input, .cform textarea{ width:100%; background:var(--black);
+              border:1px solid var(--border); color:var(--text); padding:14px;
+              font-family:var(--font-body); font-size:15px; }
+.cform input:focus, .cform textarea:focus{ outline:none; border-color:var(--orange); }
+.cform textarea{ resize:vertical; min-height:130px; }
+.cform button{ background:var(--orange); color:var(--on-orange); border:none;
+               padding:16px 40px; text-transform:uppercase; letter-spacing:2px;
+               font-weight:600; cursor:pointer; }
+.cform button:hover{ filter:brightness(1.08); }
+.cform button:disabled{ opacity:.6; cursor:default; }
+.formmsg{ margin-top:18px; font-size:15px; }
+.formmsg.ok{ color:var(--orange); }
+.formmsg.err{ color:#ff5a5a; }
+
+/* ---- Legal pages ---- */
+.legal{ max-width:780px; }
+.legal h2{ font-family:var(--font-display); font-weight:700; text-transform:uppercase;
+           font-size:26px; margin:34px 0 12px; }
+.legal p{ color:var(--text-muted); line-height:1.7; margin-bottom:14px; font-size:16px; }
+
+/* ---- 404 ---- */
+.nf{ min-height:70vh; display:flex; flex-direction:column; justify-content:center;
+     align-items:center; text-align:center; padding:64px; }
+.nf h1{ font-family:var(--font-display); font-weight:800; font-size:160px; line-height:.9;
+        text-transform:uppercase; }
+.nf h1 span{ color:var(--orange); }
+.nf p{ color:var(--text-muted); font-size:20px; margin:16px 0 34px; }
+
+/* ---- Footer ---- */
+footer{ padding:34px 64px; display:flex; justify-content:space-between;
+        align-items:center; color:var(--text-faint); text-transform:uppercase;
+        letter-spacing:2px; font-size:13px; border-top:1px solid var(--surface); }
+footer a{ color:var(--text-faint); text-decoration:none; }
+footer a:hover{ color:var(--orange); }
+footer .fnav{ display:flex; gap:24px; }

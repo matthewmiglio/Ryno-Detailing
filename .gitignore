@@ -1,2 +1,11 @@
 # Sensitive: project brief contains the Supabase key
 docs/prompt.txt
+
+# Sensitive: account profiles
+docs/profiles.md
+
+# Local Claude Code settings
+.claude/
+
+# Sensitive: test secrets (example is committed)
+tests/.env
