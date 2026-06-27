@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* ===== Ryno Detailing — desktop-only stylesheet (see docs/style.md) ===== */
-/* ponytail: desktop only, no mobile breakpoints by request */
+/* ===== Ryno Detailing — stylesheet (see docs/style.md) ===== */
+/* Desktop-first; tablet (<=1024px) + mobile (<=640px) overrides at bottom. */
 
 :root{
   --orange:#ff7314; --black:#101010; --surface:#1a1a1a; --border:#444;
@@ -15,7 +15,7 @@
 body{
   font-family:var(--font-body), sans-serif;
   background:var(--black); color:var(--text);
-  min-width:1280px; overflow-x:hidden;
+  overflow-x:hidden;
 }
 .cond{ font-family:var(--font-display), sans-serif; }
 a{ color:inherit; }
@@ -195,3 +195,89 @@ footer{ padding:34px 64px; display:flex; justify-content:space-between;
 footer a{ color:var(--text-faint); text-decoration:none; }
 footer a:hover{ color:var(--orange); }
 footer .fnav{ display:flex; gap:24px; }
+
+/* ===================================================================== */
+/* Tablet  (<=1024px)                                                     */
+/* ===================================================================== */
+@media (max-width:1024px){
+  /* stacked nav: horizontal row no longer fits the logo + links + CTA */
+  nav{ flex-direction:column; gap:18px; padding:22px 36px; }
+  nav ul{ flex-wrap:wrap; justify-content:center; gap:16px 22px; }
+
+  .hero{ padding:50px 36px 110px; gap:30px; }
+  .hero h1{ font-size:72px; }
+  .heroframe{ height:380px; }
+
+  .angle .inner{ padding:0 36px; }
+  .angle .stat b{ font-size:48px; }
+
+  .svc{ padding:90px 36px 70px; }
+  .svc h2{ font-size:48px; }
+  .scards{ grid-template-columns:repeat(2,1fr); }
+  .slist{ grid-template-columns:repeat(2,1fr); }
+
+  .pagehead{ padding:60px 36px 30px; }
+  .pagehead h1{ font-size:60px; }
+  .pad{ padding:30px 36px 70px; }
+
+  .ctaimg{ height:380px; }
+  .ctaimg h2{ font-size:48px; }
+
+  .aboutframe{ height:380px; }
+
+  footer{ padding:30px 36px; }
+}
+
+/* ===================================================================== */
+/* Mobile  (<=640px)                                                      */
+/* ===================================================================== */
+@media (max-width:640px){
+  /* stacked nav: logo on top, links wrap centered below */
+  nav{ flex-direction:column; gap:18px; padding:20px; }
+  nav ul{ flex-wrap:wrap; justify-content:center; gap:14px 18px; }
+  .navcta{ padding:11px 20px; }
+
+  .hero{ grid-template-columns:1fr; padding:30px 20px 70px; gap:28px; }
+  .hero h1{ font-size:52px; }
+  .hero p{ font-size:16px; max-width:none; margin:20px 0 28px; }
+  .heroframe{ height:280px; }
+
+  .btns{ display:flex; flex-wrap:wrap; gap:12px; }
+  .btns a{ margin-right:0; padding:15px 30px; }
+
+  .angle{ transform:skewY(-2deg); margin:-24px 0; padding:60px 0; }
+  .angle .inner{ transform:skewY(2deg); grid-template-columns:repeat(2,1fr);
+                 gap:34px 16px; padding:0 20px; }
+  .angle .stat b{ font-size:44px; }
+
+  .svc{ padding:70px 20px 50px; }
+  .svc h2{ font-size:38px; margin-bottom:30px; }
+  .scards{ grid-template-columns:1fr; }
+  .slist{ grid-template-columns:1fr; }
+
+  .pagehead{ padding:50px 20px 24px; }
+  .pagehead h1{ font-size:44px; }
+  .pagehead p{ font-size:16px; }
+  .pad{ padding:24px 20px 60px; }
+
+  .gallery{ grid-template-columns:1fr; }
+  .ba figure{ height:200px; }
+
+  .about{ grid-template-columns:1fr; gap:30px; }
+  .about p{ font-size:16px; }
+  .aboutframe{ height:300px; }
+  .team{ grid-template-columns:1fr; }
+
+  .contact{ grid-template-columns:1fr; gap:30px; }
+  .cinfo .v{ font-size:24px; }
+  .cform{ padding:24px; }
+
+  .ctaimg{ height:320px; }
+  .ctaimg h2{ font-size:38px; }
+
+  .nf{ padding:64px 20px; }
+  .nf h1{ font-size:96px; }
+
+  footer{ flex-direction:column; gap:16px; text-align:center; padding:30px 20px; }
+  footer .fnav{ flex-wrap:wrap; justify-content:center; gap:14px 20px; }
+}

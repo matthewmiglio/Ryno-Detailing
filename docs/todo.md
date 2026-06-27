@@ -17,6 +17,7 @@ Build order is top-to-bottom. Each rung mostly unblocks the next.
 - [x] Privacy policy `/privacy`
 - [x] Terms `/terms`
 - [ ] Sitemap (`app/sitemap.ts`, all public routes) + robots
+- [ ] Finished navbar — replace the scaffold nav in `app/layout.tsx` with the final design (sticky/scroll behavior, active-link state, polished logo/CTA)
 
 ## 2. Contact form + data
 - [x] Build contact form (client component `app/contact/ContactForm.tsx`; required fields, sending/success/error states; click-to-call + email links live in the page)
@@ -78,19 +79,24 @@ DB setup tasks:
 - [ ] About `/about`
 - [ ] Contact `/contact`
 
-## 6. Mobile styling (all pages)
-- [ ] Home `/`
-- [ ] Services `/services`
-- [ ] Gallery `/gallery`
-- [ ] About `/about`
-- [ ] Contact `/contact`
+## 6. Mobile + tablet styling (all pages)
+Tablet (<=1024px) and mobile (<=640px) breakpoints added to `globals.css`
+(nav stacks, grids collapse, type/padding scale down). Legal pages also covered.
+- [x] Home `/`
+- [x] Services `/services`
+- [x] Gallery `/gallery`
+- [x] About `/about`
+- [x] Contact `/contact`
 
 ## 7. Puppeteer MCP pass (all pages)
-- [ ] Home `/`
-- [ ] Services `/services`
-- [ ] Gallery `/gallery`
-- [ ] About `/about`
-- [ ] Contact `/contact`
+Audited at mobile 375 and tablet 768. No horizontal overflow, no broken/distorted
+images, all inputs labeled. Fixed: tablet nav overlap (logo over links + clipped CTA).
+- [x] Home `/`
+- [x] Services `/services`
+- [x] Gallery `/gallery`
+- [x] About `/about`
+- [x] Contact `/contact`
+- [ ] Sub-service pages `/services/[service]` (all 7) — `/puppeteer-style-audit`
 
 ## 8. Service-by-area pages (programmatic local SEO) — BIG, separate from basic scaffolding
 Pattern lifted from pxb-development/georgia-natural-scapes: data-driven dynamic
@@ -115,13 +121,13 @@ and JSON-LD. Three layers:
 - This top-down link mesh is what makes the programmatic SEO work; every generated page must be reachable by crawlers via real `<Link>`s, not just by URL.
 
 Tasks:
-- [ ] `src/data/service-data.ts` — one entry per service (slug, name, shortDesc, hero image, body copy)
+- [x] Service data — `website/app/data.ts` `subServices` (7 consolidated services: slug, lead/accent, intro, body, includes[], before/after pairs). NOTE: no `src/` dir in this project, data lives in app/data.ts. Photos are interior-only, so exterior/wax/wheels/window pages render copy-only (no gallery) until exterior assets exist.
 - [ ] `src/data/area-data.ts` — one entry per service area (slug, name, county/region, intro, neighborhoods, local copy)
-- [ ] Layer 2 route `/services/[service]/page.tsx` — `generateStaticParams` over services; links to its area pages
+- [x] Layer 2 route `/services/[service]/page.tsx` — `generateStaticParams` over the 7 sub-services; per-page `generateMetadata` (title+desc only so far, no canonical/OG/JSON-LD yet); each page ends in a CTA `<Link href="/contact">`. Still TODO once layer 3 exists: link each sub-service down to its area pages.
 - [ ] Layer 3 route `/services/[service]/[area]/page.tsx` — `generateStaticParams` over service × area; `notFound()` on bad slug
 - [ ] Per-page SEO: dynamic `generateMetadata` (title, description, canonical, OG/Twitter) + JSON-LD `Service`/`LocalBusiness` schema with `areaServed`
 - [ ] Shared content component (e.g. `ServiceAreaContent`) so all area pages render consistently
-- [ ] Wire layer 1 `/services` to link each service; wire each service to link its areas (internal-link mesh for SEO)
+- [ ] Wire layer 1 `/services` to link each service; wire each service to link its areas (internal-link mesh for SEO) — layer 1 -> sub-service DONE (`/services` card grid links all 7); service -> area pending layer 3.
 - [ ] Add area pages to sitemap
 
 ## 9. Dashboard
@@ -209,6 +215,5 @@ Standalone scripts in `tests/` (Python, own gitignored `tests/.env`). Mostly std
 - [x] Resend API key / email send (`tests/test_resend.py`) — verified, real send to matmigg0804@gmail.com succeeded
 - [x] Supabase connectivity + RLS (`tests/test_supabase_rls.py`) — inserts into all 3 `RYNO_` tables with service-role (succeeds) vs anon (blocked by RLS), then cleans up its rows. All PASS.
 - [x] Dashboard RPC policies (`tests/test_dashboard_rpc.py`) — calls both read RPCs with service-role (200 + shape check) vs anon (401, execute revoked). All PASS.
-- [x] Live contact form E2E (`tests/test_contact_form.py`, Playwright) — visits `rynodetailing.com/contact`, fills + submits, asserts `/api/send-email` 200 + success message + no page/console errors. Embeds a marker for manual email-receipt check. WRITTEN, not yet run (needs the wired form deployed). Run: `python -m playwright install chromium` then `python tests/test_contact_form.py`.
-- [ ] Contact form end-to-end (POST `/api/forms` → `RYNO_FORMS` row + Resend email)
-- [ ] Analytics insert (POST `/api/analytics` → `RYNO_ANALYTICS` row)
+- [x] Live contact form E2E (`tests/test_contact_form.py`, Playwright) — visits `rynodetailing.com/contact`, fills + submits, asserts `/api/forms` 200 + success message + no page/console errors. Embeds a marker for manual email-receipt check. PASSED against prod (200, clean). Run: `python -m playwright install chromium` then `python tests/test_contact_form.py`.
+- [x] Live analytics E2E (`tests/test_analytics.py`, Playwright) — visits a few pages under a unique synthetic user-agent, asserts each `/api/analytics` POST 200, then pulls the 50 most recent `RYNO_ANALYTICS` rows and confirms every visited path appears (matched by the synthetic `ua`), then deletes those synthetic rows. PASSED against prod (4/4 paths recorded + cleaned up). Optional `SITE_URL` override (default `https://rynodetailing.com`).

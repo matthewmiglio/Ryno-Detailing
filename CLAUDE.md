@@ -25,6 +25,6 @@ Auto detailing business. Two Next.js apps plus a docs folder.
   `AGENTS.md`.
 - Secrets live in `website/.env.local` and `dashboard/.env.local` (gitignored).
   `.env.example` in each app lists the keys with placeholder values.
-- Backend is Supabase (project `rxwdtssnaymiebnhudix`); contact email is Resend.
+- Backend is Supabase (project `rxwd**********hudix`); contact email is Resend.
 - After meaningful changes, append an entry to `docs/progress.md` and tick the
   matching `docs/todo.md` item.

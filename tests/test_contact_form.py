@@ -61,11 +61,12 @@ def main():
         )
 
         # Submit and capture the API response in one shot.
-        with page.expect_response("**/api/send-email", timeout=20000) as resp_info:
+        # The form POSTs /api/forms (saves to Supabase + sends email server-side).
+        with page.expect_response("**/api/forms", timeout=20000) as resp_info:
             page.click("button[type=submit]")
         resp = resp_info.value
         status = resp.status
-        print(f"POST /api/send-email -> {status}")
+        print(f"POST /api/forms -> {status}")
 
         # Confirm the UI reported success.
         try:
@@ -79,7 +80,7 @@ def main():
     # ---- verdict ----
     problems = []
     if status != 200:
-        problems.append(f"send-email returned HTTP {status}, expected 200")
+        problems.append(f"/api/forms returned HTTP {status}, expected 200")
     if not success_shown:
         problems.append("success message did not appear on the page")
     if page_errors:

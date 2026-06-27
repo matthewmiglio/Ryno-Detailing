@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { contact, packages, services } from "../data";
+import { contact, packages, services, subServices } from "../data";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -31,7 +31,19 @@ export default function Services() {
         </div>
       </section>
 
-      <section className="svc" style={{ paddingTop: 0 }}>
+      <section className="svc" style={{ paddingTop: 0, paddingBottom: 0 }}>
+        <h2 className="cond">What we <span>do</span>.</h2>
+        <div className="scards">
+          {subServices.map((s) => (
+            <Link className="scard" key={s.slug} href={`/services/${s.slug}`} style={{ textDecoration: "none" }}>
+              <h3 className="cond">{s.lead} {s.accent}</h3>
+              <p>{s.intro}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="svc" style={{ paddingTop: 90 }}>
         <h2 className="cond">Every <span>service</span> we run.</h2>
         <div className="slist">
           {services.map((s) => (
