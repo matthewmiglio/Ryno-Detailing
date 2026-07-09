@@ -16,8 +16,8 @@ Build order is top-to-bottom. Each rung mostly unblocks the next.
 - [x] 404 / not-found (branded)
 - [x] Privacy policy `/privacy`
 - [x] Terms `/terms`
-- [ ] Sitemap (`app/sitemap.ts`, all public routes) + robots
-- [ ] Finished navbar — replace the scaffold nav in `app/layout.tsx` with the final design (sticky/scroll behavior, active-link state, polished logo/CTA)
+- [x] Sitemap (`app/sitemap.ts`, all 49 public routes) + robots (`app/robots.ts` — `/api/` blocked, preview/staging noindex via `VERCEL_ENV`, host + sitemap ref)
+- [ ] Finished navbar — replace the scaffold nav in `app/layout.tsx` with the final design (sticky/scroll behavior, active-link state, polished logo/CTA). DONE so far: Services is now a zero-JS `<details>` dropdown (All Services + 7 sub-services), responsive across desktop/tablet/mobile. Still pending: sticky/scroll behavior, active-link state.
 
 ## 2. Contact form + data
 - [x] Build contact form (client component `app/contact/ContactForm.tsx`; required fields, sending/success/error states; click-to-call + email links live in the page)
@@ -64,7 +64,7 @@ Tables:
   - `id` uuid pk default `gen_random_uuid()`, `created_at` timestamptz default `now()`
   - `site_name` text, `visitor_id` text, `session_id` text, `ip_hash` text, `ua` text, `referrer` text
   - `city` text, `state` text, `country` text
-- [ ] (optional) `RYNO_EMAIL_LOG` — audit of sent emails: `id`, `created_at`, `to` text, `subject` text, `status` text, `resend_id` text
+- [x] ~~(optional) `RYNO_EMAIL_LOG`~~ — dropped by request; not building an email audit table.
 
 DB setup tasks:
 - [x] Write `supabase/schema.sql` creating the 3 `RYNO_` tables above (quoted uppercase names; `pgcrypto` for `gen_random_uuid()`). Applied to project `rxwdtssnaymiebnhudix` via the Management API (`tests/apply_schema.py`).
@@ -122,19 +122,18 @@ and JSON-LD. Three layers:
 
 Tasks:
 - [x] Service data — `website/app/data.ts` `subServices` (7 consolidated services: slug, lead/accent, intro, body, includes[], before/after pairs). NOTE: no `src/` dir in this project, data lives in app/data.ts. Photos are interior-only, so exterior/wax/wheels/window pages render copy-only (no gallery) until exterior assets exist.
-- [ ] `src/data/area-data.ts` — one entry per service area (slug, name, county/region, intro, neighborhoods, local copy)
-- [x] Layer 2 route `/services/[service]/page.tsx` — `generateStaticParams` over the 7 sub-services; per-page `generateMetadata` (title+desc only so far, no canonical/OG/JSON-LD yet); each page ends in a CTA `<Link href="/contact">`. Still TODO once layer 3 exists: link each sub-service down to its area pages.
-- [ ] Layer 3 route `/services/[service]/[area]/page.tsx` — `generateStaticParams` over service × area; `notFound()` on bad slug
-- [ ] Per-page SEO: dynamic `generateMetadata` (title, description, canonical, OG/Twitter) + JSON-LD `Service`/`LocalBusiness` schema with `areaServed`
-- [ ] Shared content component (e.g. `ServiceAreaContent`) so all area pages render consistently
-- [ ] Wire layer 1 `/services` to link each service; wire each service to link its areas (internal-link mesh for SEO) — layer 1 -> sub-service DONE (`/services` card grid links all 7); service -> area pending layer 3.
-- [ ] Add area pages to sitemap
+- [x] Area data — `website/app/area-data.ts` (`areaData: Record<slug, AreaInfo>` + `areaKeys`). 5 areas (atlanta, hillman, alpena, lachine, mio) following the GNS city-data system: intro, county, neighborhoods, climate, population, uniqueFact, projects[] (images + serviceTypes), reviews[], faqs[], localConstraints, popularProjects. 7 services x 5 areas = 35 combos. NOTE: image-bearing projects only for the 3 photographed services (interior/leather/stain); the 4 imageless services get reviews+faqs+popularProjects only. Reviews/projects are demo content (owner's call).
+- [x] Layer 2 route `/services/[service]/page.tsx` — `generateStaticParams` over the 7 sub-services; per-page `generateMetadata` (title+desc; JSON-LD/OG tracked in the SEO task below); each page ends in a CTA `<Link href="/contact">` and a "near you" `.slist` linking all 5 of its layer-3 area pages.
+- [x] Layer 3 route `/services/[service]/[area]/page.tsx` — `generateStaticParams` over service × area (35 SSG pages); `notFound()` on bad slug; filters the area's projects/reviews/faqs by `serviceTypes`; CTA `<Link href="/contact">`. Reuses existing CSS classes.
+- [x] Per-page SEO: `generateMetadata` does title + description + canonical; OG/Twitter inherited from root layout `metadata` (metadataBase + openGraph + twitter card); JSON-LD `Service` (with `provider` -> site `LocalBusiness` @id, `areaServed`), `BreadcrumbList`, and `FAQPage` (where FAQs render) + `AggregateRating`/`Review` (where reviews render) server-rendered via `app/seo.tsx` `JsonLd`.
+- [ ] Shared content component (e.g. `ServiceAreaContent`) so all area pages render consistently — ponytail deviation: layer-3 markup is inlined in the page for now (one consumer). Extract only if layer 2 needs to share it.
+- [x] Wire layer 1 `/services` to link each service; wire each service to link its areas (internal-link mesh for SEO) — DONE both halves: `/services` card grid links all 7 sub-services; each layer-2 page has a "near you" `.slist` linking all 5 of its area pages.
+- [x] Add area pages to sitemap (all 35 service×area + 7 sub-service URLs emitted by `app/sitemap.ts`)
+- [ ] Owner verification before launch: the local content in `website/app/area-data.ts` (neighborhoods, projects, reviews, FAQs, local copy) is AI-generated from model training-data memory, NOT web-researched — accuracy is mixed/unverified. Ryder should confirm or correct the local place names and review the demo reviews/projects before go-live. (Owner accepted as-is for now; a web-research pass was offered and declined.)
 
 ## 9. Dashboard
 - [x] Dashboard auth (HTTP Basic Auth via `dashboard/proxy.ts`) — empty placeholder page gated; DASHBOARD_USER/PASSWORD in env. NOTE: Next 16 renamed `middleware.ts` -> `proxy.ts` (root, fn named `proxy`); guide below still says middleware.
-- [ ] Dashboard layout (shell, nav between the two pages)
-  - [ ] Overview / analytics page
-  - [ ] Contact submissions page
+- [x] Dashboard overview page (`dashboard/app/page.tsx`) — single server-rendered page (`dynamic = "force-dynamic"`), pulls both RPCs via `lib/supabase.ts` and shows: 3 stat cards (form submissions, pageviews, **phone-call clicks**), an inline-SVG pageviews-per-day bar chart, a top-pages bar list, and a recent-submissions table. ponytail: one page covers overview + submissions; split out a second page only if it gets crowded. No chart lib (inline SVG/CSS bars). **(2026-07-09) Now split into `?tab=` tabs — Overview / Traffic / Contacts — and expanded with unique visitors + sessions, top referrers, and phone-clicks/forms over time (activity_by_day). See progress.md.**
 - [x] Dashboard RPCs (read analytics + form submissions from Supabase) — `supabase/rpc.sql` + typed wrappers in `dashboard/lib/supabase.ts` (`getDashboardStats`, `getRecentForms`). Locked to `service_role`; tested. (The layout/pages above still consume these.)
 
 ### Auth guide (lifted from `wow_fishbot/dashboard`)
@@ -214,6 +213,6 @@ How it works:
 Standalone scripts in `tests/` (Python, own gitignored `tests/.env`). Mostly stdlib-only; the Playwright E2E needs `playwright` + a browser.
 - [x] Resend API key / email send (`tests/test_resend.py`) — verified, real send to matmigg0804@gmail.com succeeded
 - [x] Supabase connectivity + RLS (`tests/test_supabase_rls.py`) — inserts into all 3 `RYNO_` tables with service-role (succeeds) vs anon (blocked by RLS), then cleans up its rows. All PASS.
-- [x] Dashboard RPC policies (`tests/test_dashboard_rpc.py`) — calls both read RPCs with service-role (200 + shape check) vs anon (401, execute revoked). All PASS.
+- [x] Dashboard RPCs (`tests/test_dashboard_rpc.py`) — two phases: (1) policy/shape — both read RPCs with service-role (200 + shape check) vs anon (401, execute revoked); (2) data round-trip — injects tagged fake rows (4 forms, 50 views on a unique path, 3 phone clicks), calls both RPCs and asserts each total grew by exactly that much, the unique path lands in `top_pages`, today's bucket is in `pageviews_by_day`, and `ryno_forms_recent` returns the tagged forms, then deletes every tagged row. All PASS.
 - [x] Live contact form E2E (`tests/test_contact_form.py`, Playwright) — visits `rynodetailing.com/contact`, fills + submits, asserts `/api/forms` 200 + success message + no page/console errors. Embeds a marker for manual email-receipt check. PASSED against prod (200, clean). Run: `python -m playwright install chromium` then `python tests/test_contact_form.py`.
 - [x] Live analytics E2E (`tests/test_analytics.py`, Playwright) — visits a few pages under a unique synthetic user-agent, asserts each `/api/analytics` POST 200, then pulls the 50 most recent `RYNO_ANALYTICS` rows and confirms every visited path appears (matched by the synthetic `ua`), then deletes those synthetic rows. PASSED against prod (4/4 paths recorded + cleaned up). Optional `SITE_URL` override (default `https://rynodetailing.com`).

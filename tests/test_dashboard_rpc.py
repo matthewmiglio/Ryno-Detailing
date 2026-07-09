@@ -14,8 +14,8 @@ Phase 2 — data round-trip (service role):
   2. Inject tagged fake rows: N forms, M analytics pageviews on a unique path,
      K phone clicks (all tagged site_name = a unique run marker).
   3. Call both RPCs and assert the fake data shows up: each total grew by exactly
-     what was injected, today's bucket is in pageviews_by_day, the unique path is
-     in top_pages with the right count, and ryno_forms_recent returns our forms.
+     what was injected, the injected counts show up in activity_by_day, the unique
+     path is in top_pages with the right count, and ryno_forms_recent returns our forms.
   4. Delete every tagged row (cleanup), pass or fail.
 
 Reads tests/.env:
@@ -89,7 +89,8 @@ def test_policy(base, service_key, anon_key):
             failures.append(f"{name}: service-role expected 200, got {st}: {str(payload)[:200]}")
         elif name == "ryno_dashboard_stats":
             keys = {"total_forms", "total_pageviews", "total_phone_clicks",
-                    "pageviews_by_day", "top_pages"}
+                    "unique_visitors", "unique_sessions",
+                    "activity_by_day", "top_pages", "top_referrers"}
             if not (isinstance(payload, dict) and keys <= set(payload)):
                 failures.append(f"{name}: missing expected keys, got {str(payload)[:200]}")
             else:
@@ -153,10 +154,15 @@ def test_data_roundtrip(base, service_key):
         check_delta("total_pageviews", M_VIEWS)
         check_delta("total_phone_clicks", K_CLICKS)
 
-        if not after["pageviews_by_day"]:
-            failures.append("pageviews_by_day is empty after inserting views")
-        else:
-            print(f"  pageviews_by_day buckets: {len(after['pageviews_by_day'])} OK")
+        # activity_by_day is windowed, so its per-measure sums must be >= what we
+        # just injected (all within the 30-day window).
+        act = after["activity_by_day"]
+        sums = {m: sum(d[m] for d in act) for m in ("pageviews", "phone_clicks", "forms")}
+        for m, want in (("pageviews", M_VIEWS), ("phone_clicks", K_CLICKS), ("forms", N_FORMS)):
+            ok = sums[m] >= want
+            print(f"  activity_by_day {m} sum={sums[m]} (>= {want}) {'OK' if ok else 'FAIL'}")
+            if not ok:
+                failures.append(f"activity_by_day {m} sum {sums[m]} < injected {want}")
 
         top = {p["path"]: p["views"] for p in after["top_pages"]}
         if path not in top:

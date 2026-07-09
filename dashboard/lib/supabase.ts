@@ -13,8 +13,11 @@ export type DashboardStats = {
   total_forms: number;
   total_pageviews: number;
   total_phone_clicks: number;
-  pageviews_by_day: { day: string; views: number }[];
+  unique_visitors: number;
+  unique_sessions: number;
+  activity_by_day: { day: string; pageviews: number; phone_clicks: number; forms: number }[];
   top_pages: { path: string; views: number }[];
+  top_referrers: { referrer: string; views: number }[];
 };
 
 export type FormSubmission = {

@@ -9,6 +9,7 @@
 -- Idempotent (create or replace). Apply: python tests/apply_schema.py supabase/rpc.sql
 
 -- Aggregate stats for the analytics overview page.
+-- Totals + unique counts are all-time; the *_by_day / top_* series are windowed to `days`.
 create or replace function public.ryno_dashboard_stats(days int default 30)
 returns json
 language sql
@@ -19,13 +20,28 @@ as $$
     'total_forms',        (select count(*) from "RYNO_FORMS"),
     'total_pageviews',    (select count(*) from "RYNO_ANALYTICS"),
     'total_phone_clicks', (select count(*) from "RYNO_PHONE_CLICKS"),
-    'pageviews_by_day', (
+    'unique_visitors',    (select count(distinct visitor_id) from "RYNO_ANALYTICS"),
+    'unique_sessions',    (select count(distinct session_id) from "RYNO_ANALYTICS"),
+    -- One combined day series so the dashboard can chart pageviews, phone clicks,
+    -- and forms on the same timeline. UNION ALL tags each event, then group by day.
+    'activity_by_day', (
       select coalesce(json_agg(row_to_json(d) order by d.day), '[]'::json)
       from (
-        select date_trunc('day', created_at)::date as day, count(*) as views
-        from "RYNO_ANALYTICS"
-        where created_at >= now() - make_interval(days => days)
-        group by 1
+        select e.day,
+               sum(e.pageviews)    as pageviews,
+               sum(e.phone_clicks) as phone_clicks,
+               sum(e.forms)        as forms
+        from (
+          select date_trunc('day', created_at)::date as day, 1 as pageviews, 0 as phone_clicks, 0 as forms
+            from "RYNO_ANALYTICS"    where created_at >= now() - make_interval(days => days)
+          union all
+          select date_trunc('day', created_at)::date, 0, 1, 0
+            from "RYNO_PHONE_CLICKS" where created_at >= now() - make_interval(days => days)
+          union all
+          select date_trunc('day', created_at)::date, 0, 0, 1
+            from "RYNO_FORMS"        where created_at >= now() - make_interval(days => days)
+        ) e
+        group by e.day
       ) d
     ),
     'top_pages', (
@@ -38,6 +54,21 @@ as $$
         order by count(*) desc
         limit 10
       ) p
+    ),
+    -- Referrer host only (strip scheme + www + path). NULL/empty => 'direct'.
+    'top_referrers', (
+      select coalesce(json_agg(row_to_json(r)), '[]'::json)
+      from (
+        select
+          case when referrer is null or referrer = '' then 'direct'
+               else regexp_replace(referrer, '^(https?://)?(www\.)?([^/?#]+).*$', '\3') end as referrer,
+          count(*) as views
+        from "RYNO_ANALYTICS"
+        where created_at >= now() - make_interval(days => days)
+        group by 1
+        order by count(*) desc
+        limit 10
+      ) r
     )
   );
 $$;
