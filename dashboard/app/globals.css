@@ -6,3 +6,13 @@ body {
   background: #101010;
   color: #ededed;
 }
+
+/* Chart bars: cursor + brighten on hover so it's clear each bar is hoverable
+   (the native <title> tooltip shows the date + value). */
+.chart-bar {
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.chart-bar:hover {
+  filter: brightness(1.2);
+}

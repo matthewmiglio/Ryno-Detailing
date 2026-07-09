@@ -29,24 +29,54 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 // Inline SVG bar chart — ponytail: a few lines beats pulling in a charting lib.
 // Generic over one measure so pageviews / phone clicks / forms all reuse it.
+// Fixed viewBox + margins so the axis labels stay a consistent size at any bar count.
 function Bars({ data, empty }: { data: { day: string; value: number }[]; empty: string }) {
   if (!data.length) return <p className="text-neutral-400">{empty}</p>;
   const max = Math.max(...data.map((d) => d.value), 1);
-  const H = 160, gap = 4, maxBar = 40;
-  // Cap bar width so a single day reads as a bar, not a full-width block.
-  const bw = Math.min(maxBar, 720 / data.length - gap);
-  const W = data.length * (bw + gap);
+
+  const VW = 720, VH = 200, ML = 34, MR = 6, MT = 8, MB = 22; // left/right/top/bottom margins for axes
+  const PW = VW - ML - MR, PH = VH - MT - MB;                  // plot area
+  const band = PW / data.length;
+  const bw = Math.min(band - 4, 40); // cap so a single day reads as a bar, not a block
+  const y = (v: number) => MT + PH - (v / max) * PH;
+
+  const yTicks = [0, Math.round(max / 2), max].filter((v, i, a) => a.indexOf(v) === i);
+  const xStep = Math.max(1, Math.ceil(data.length / 6)); // ~6 date labels, else it crowds
+  const shortDate = (day: string) => { const [, m, d] = day.split("-"); return `${+m}/${+d}`; };
+
   return (
-    <svg viewBox={`0 0 ${Math.max(W, 1)} ${H}`} preserveAspectRatio="xMinYMid meet"
-         className="w-full" height={H} role="img" aria-label="Activity per day">
+    <svg viewBox={`0 0 ${VW} ${VH}`} preserveAspectRatio="xMidYMid meet"
+         className="w-full h-auto" role="img" aria-label="Value per day, with day and count axes">
+      {/* Y axis: gridlines + count labels */}
+      {yTicks.map((v) => (
+        <g key={v}>
+          <line x1={ML} y1={y(v)} x2={VW - MR} y2={y(v)} stroke="#404040" strokeWidth={0.5} />
+          <text x={ML - 4} y={y(v)} textAnchor="end" dominantBaseline="middle" fontSize={10} fill="#a3a3a3">
+            {v.toLocaleString()}
+          </text>
+        </g>
+      ))}
+      {/* axis lines */}
+      <line x1={ML} y1={MT} x2={ML} y2={MT + PH} stroke="#525252" strokeWidth={0.5} />
+      <line x1={ML} y1={MT + PH} x2={VW - MR} y2={MT + PH} stroke="#525252" strokeWidth={0.5} />
+      {/* bars */}
       {data.map((d, i) => {
-        const h = (d.value / max) * (H - 20);
+        const h = (d.value / max) * PH;
         return (
-          <rect key={d.day} x={i * (bw + gap)} y={H - h} width={bw} height={h} fill={ORANGE}>
-            <title>{`${d.day}: ${d.value}`}</title>
+          <rect key={d.day} x={ML + i * band + (band - bw) / 2} y={MT + PH - h} width={bw} height={h}
+                fill={ORANGE} className="chart-bar">
+            <title>{`${d.day}: ${d.value.toLocaleString()}`}</title>
           </rect>
         );
       })}
+      {/* X axis: date labels (first, every xStep, and last) */}
+      {data.map((d, i) =>
+        i % xStep === 0 || i === data.length - 1 ? (
+          <text key={d.day} x={ML + i * band + band / 2} y={VH - 6} textAnchor="middle" fontSize={10} fill="#a3a3a3">
+            {shortDate(d.day)}
+          </text>
+        ) : null
+      )}
     </svg>
   );
 }
