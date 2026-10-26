@@ -17,7 +17,7 @@
 ---
 
 2026-06-27
-Scaffolded the project at C:\My_Files\my_programs\ryno-detailing\
+Scaffolded the project at M:\my_files\my_programs\ryno-detailing\
 Created Next.js website/ via `npx create-next-app@latest` (defaults).
 Imported service photos into website/public/images/ (JPGs as-is, HEICs converted to JPG).
 Moved the project brief to docs/prompt.txt and gitignored it (contains the Supabase key).
